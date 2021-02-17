@@ -2,7 +2,7 @@ mysql:
     port: "3306"
     host: "localhost"
     user: "root"
-    password: "password123"
+    password: "password"
     database: "classicmodels"
     query: "select * from customers"
 http:
