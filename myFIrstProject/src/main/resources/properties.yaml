@@ -1,0 +1,9 @@
+mysql:
+    port: "3306"
+    host: "localhost"
+    user: "root"
+    password: "password"
+    database: "classicmodels"
+    query: "select * from customers"
+http:
+    port: "8081"

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2f1100ee-92c7-4e9f-8ed0-bd5127b5dff1" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="7ec2517c-84e0-4cfb-b945-eb0762181cda" >
+		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.user}" password="${mysql.password}" database="${mysql.database}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="4418569e-013e-4a3a-9723-f6a54d2bae78" file="properties.yaml" />
+	<flow name="mytestFlow" doc:id="77ac20f9-45ae-4fd8-ab27-2060f2f92e7b" >
+		<http:listener doc:name="Listener" doc:id="7012fd7d-6096-4c5a-8171-51f9e8b1fb13" config-ref="HTTP_Listener_config" path="/myTest"/>
+		<db:select doc:id="42a329b0-2ce9-44c1-a79e-93614cf508fe" config-ref="Database_Config">
+			<db:sql ><![CDATA[${mysql.query}]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="072752d5-5f65-47ce-8615-9f5aed52c63e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
