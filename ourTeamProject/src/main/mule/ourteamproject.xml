@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3fd8724f-3053-45ba-93a0-8e93a8d4b92d" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<flow name="ourteamprojectFlow" doc:id="ba2acc96-06f2-4e92-b55c-495cb4df890d" >
+	<flow name="ourTeamProjectFlow" doc:id="ba2acc96-06f2-4e92-b55c-495cb4df890d" >
 		<http:listener doc:name="Listener" doc:id="89eaf0cb-aa47-4898-bf17-22ef55a73b00" config-ref="HTTP_Listener_config" path="/quote"/>
 		<set-variable value="#[attributes.queryParams.author]" doc:name="Set Variable" doc:id="ea44ab9f-31b0-4eab-914f-7b3594cb1615" variableName="author"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="de45684c-3804-4988-a5cc-dd3c9d2457e4" >
