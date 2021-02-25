@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ibm-mq="http://www.mulesoft.org/schema/mule/ibm-mq" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ibm-mq http://www.mulesoft.org/schema/mule/ibm-mq/current/mule-ibm-mq.xsd">
+	<sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="70d83a50-a41e-476d-8fdb-1d014430908e" >
+		<sftp:connection workingDir="upload" host="localhost" port="2222" username="foo" password="pass" />
+	</sftp:config>
+	<ibm-mq:config name="IBM_MQ_Config" doc:name="IBM MQ Config" doc:id="0b216b00-8821-474f-a2fe-911f705d71bd" >
+		<ibm-mq:connection username="admin" password="passw0rd" >
+			<ibm-mq:connection-mode >
+				<ibm-mq:client host="localhost" queueManager="QM1" channel="DEV.ADMIN.SVRCONN" />
+			</ibm-mq:connection-mode>
+		</ibm-mq:connection>
+	</ibm-mq:config>
+	<flow name="mysftptomqFlow" doc:id="00820b37-f224-4008-9e49-6b64b6f8c45d" >
+		<sftp:listener doc:name="On New or Updated File" doc:id="c541fbdf-5ca5-4214-b560-3814f1607bcc" config-ref="SFTP_Config" recursive="false" autoDelete="true" moveToDirectory="processed" renameTo="#[attributes.fileName as String ++ '_' ++ (now() as String {format: &quot;yyy_MM_dd_HH_mm_ss&quot;})]">
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</sftp:listener>
+		<ee:transform doc:name="Transform Message" doc:id="ecaf05be-1cf7-4280-8836-0411b2ffc8c2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="87787334-18e3-4986-8cca-237c36c09674" >
+			<ibm-mq:publish doc:name="Publish" doc:id="896ebf3a-4625-4746-aaa6-2f4bcb8233cb" config-ref="IBM_MQ_Config" destination="DEV.QUEUE.1">
+				<ibm-mq:message >
+					<ibm-mq:body ><![CDATA[#[payload.email]]]></ibm-mq:body>
+				</ibm-mq:message>
+			</ibm-mq:publish>
+		</foreach>
+	</flow>
+</mule>
